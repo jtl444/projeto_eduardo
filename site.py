@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
 
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -97,10 +95,3 @@ if submitted:
     st.pyplot(fig)
 
     st.write(f"**ASSESSOR:** {assessor}   **SITE:** {site}   **DATE:** {date}")
-
-
-# In[ ]:
-
-
-
-
