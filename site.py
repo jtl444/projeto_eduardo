@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[3]:
+
 
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -55,7 +57,7 @@ with st.form("recovery_form"):
 
     submitted = st.form_submit_button("Update wheel")
 
-# Dados para o radar chart
+# Labels e valores
 labels = [
     "Over-utilization", "Invasive species", "Contamination",
     "Substrate physical", "Substrate chemical", "Water chemo-physical",
@@ -73,20 +75,41 @@ values = [
     landscape_flows, gene_flows, habitat_links
 ]
 
-# Radar chart
+# Cores para cada valor
+value_colors = {
+    0: "#FFFFFF",  # Branco (ou troque para cinza claro se preferir)
+    1: "#C2E8D0",  # Verde escuro
+    2: "#E1EFD3",  # Verde claro
+    3: "#EDEDC7",  # Amarelo
+    4: "#F0C2C3",  # Laranja
+    5: "#EDBEC2",  # Vermelho
+}
+
 if submitted:
     N = len(labels)
     angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
-    values += values[:1]  # Fechar o gráfico
-    angles += angles[:1]
+    values_plot = values + [values[0]]
+    angles_plot = angles + [angles[0]]
 
-    fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True))
-    ax.plot(angles, values, color='b', linewidth=2)
-    ax.fill(angles, values, color='b', alpha=0.25)
+    fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True), facecolor='white')
+
+    # Preencher cada setor com a cor correspondente ao valor selecionado
+    for i in range(N):
+        val = int(values[i])
+        color = value_colors.get(val, "#FFFFFF")
+        ax.fill(
+            [0, angles[i], angles[(i+1)%N], 0],
+            [0, values[i], values[(i+1)%N], 0],
+            color=color, alpha=0.9, zorder=2
+        )
+
+    # Desenhar a linha do radar por cima
+    ax.plot(angles_plot, values_plot, color='black', linewidth=2, zorder=3)
+    ax.fill(angles_plot, values_plot, color='none', alpha=0.25, zorder=3)
 
     # Ajustar labels
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(labels, fontsize=10)
+    ax.set_xticks(angles)
+    ax.set_xticklabels(labels, fontsize=9)
     ax.set_yticks([1, 2, 3, 4, 5])
     ax.set_yticklabels(['1', '2', '3', '4', '5'])
     ax.set_ylim(0, 5)
@@ -95,3 +118,10 @@ if submitted:
     st.pyplot(fig)
 
     st.write(f"**ASSESSOR:** {assessor}   **SITE:** {site}   **DATE:** {date}")
+
+
+# In[ ]:
+
+
+
+
