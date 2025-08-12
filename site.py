@@ -8,6 +8,8 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
+import pandas as pd
+from io import BytesIO
 
 st.set_page_config(page_title="Recovery Wheel", layout="centered")
 
@@ -118,6 +120,36 @@ if submitted:
     st.pyplot(fig)
 
     st.write(f"**ASSESSOR:** {assessor}   **SITE:** {site}   **DATE:** {date}")
+
+    # --- Botão para baixar os dados em Excel ---
+    # Montar DataFrame com os dados
+    data_dict = {
+        "Indicador": labels,
+        "Valor": values
+    }
+    df = pd.DataFrame(data_dict)
+
+    # Adicionar informações extras (opcional)
+    df_info = pd.DataFrame({
+        "Assessor": [assessor],
+        "Site": [site],
+        "Date": [date]
+    })
+
+    # Salvar em Excel na memória
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df_info.to_excel(writer, index=False, sheet_name='Info')
+        df.to_excel(writer, index=False, sheet_name='Dados')
+    output.seek(0)
+
+    # Botão de download
+    st.download_button(
+        label="Baixar dados em Excel",
+        data=output,
+        file_name=f"recovery_wheel_{site}_{date}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 
 # In[ ]:
